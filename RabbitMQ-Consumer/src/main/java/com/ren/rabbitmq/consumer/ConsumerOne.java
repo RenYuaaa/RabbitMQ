@@ -84,18 +84,6 @@ public class ConsumerOne {
             channel.basicConsume(Queue, true, defaultConsumer);
 
 
-
-            // 消费者接收消息
-//            QueueingConsumer.Delivery delivery = null;
-//            try {
-//                delivery = consumer.nextDelivery();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            // 获取消息正文
-//            String message = new String(delivery.getBody());
-//            System.out.println("接收到的消息：" + message);
-
         } catch (IOException e) {
             System.out.println("接收消息失败" + e);
         } catch (TimeoutException e) {
