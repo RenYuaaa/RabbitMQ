@@ -184,3 +184,59 @@ RabbitMQ有以下几种工作模式：
 
 ​	3、publish/subscribe比work queues的功能更强大，publish/subcribe也可以将多个消费者监听同一个队列，从而实验work queues的功能
 
+
+
+## 3.3 Routing
+
+### 3.3.1 路由模式
+
+![路由模式](图片/16cd781beac9c174.jpg)
+
+路由模式：
+
+​	1、一个交换机绑定多个队列，每个队列蛇者routingKey，并且一个队列可以设置多个routingKey。
+
+​	2、每个消费者监听自己的队列
+
+​	3、生产者将消息发给交换机，发送消息时需要指定routingKey的值，交换机来判断该routingKey的值和那个队列的routingKey相等，如果相等则将消息转发给该队列。
+
+
+
+**Routing模式和Publish/subscibe的区别？**
+
+​	1、Publish/subscibe模式再绑定交换机时不需要指定routingKey，消息发送给每个绑定交换机的队列。
+
+​	2、Routing模式要求队列再绑定交换机时要指定routingKey（这就是队列routingKey），发送消息将消息发送到和routingKey的值相等的队列中。每个队列可以指定多个routingKey，如果发送消息时指定routingKey为“orange”，两个队列的routingKey都是“orange”，所以消息会发送给两个队列。
+
+​	3、如上图所示：如果发送消息时只当routingKey为"black"， 则只有C2可以接收到消息。
+
+​	4、Routing模式更加强大，他也可以实现Publish/subscibe的功能。
+
+
+
+## 3.4 Topics
+
+### 3.4.1 主题模式(路由模式的一种)
+
+![Topics模式](图片/topics.jpg)
+
+主题模式：
+
+​	1、该模式也是路由模式的一种，一个交换机可以绑定多个队列，每个队列可以设置一个或多个带通配符的routingKey。
+
+​	2、生产者将消息发给交换机，交换机根据routingKey的值来匹配队列，匹配时采用通配符方式，匹配成功的将消息转发到指定的队列。
+
+
+
+**Topics模式与Routing模式的区别**
+
+​	1、Topics模式与Routing模式的基本原理相同，即：生产者将消息发给交换机，交换机根据routingKey将消息转发给与routingKey匹配的队列。
+
+​	2、不同之处：routingKey的匹配方式，Routing模式是相等匹配，topics模式是通配符模式。
+
+```
+符号#：匹配一个或者多个词（每个词中间以.分隔），比如inform.#可以匹配到inform.sms，inform.email、inform.sms.email
+
+符号*：只能匹配到一个词，比如inform.*，可以匹配inform.sms、inform.email
+```
+

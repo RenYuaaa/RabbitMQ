@@ -1,4 +1,4 @@
-package com.ren.rabbitmq.producer;
+package com.ren.rabbitmq.producer.publish;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -28,7 +28,7 @@ public class Prodecer_Publish {
 
         //通过连接工厂创建心的连接和MQ建立连接
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.96.97.219");
+        connectionFactory.setHost("39.107.94.251");
         connectionFactory.setPort(5672);
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");
@@ -70,8 +70,8 @@ public class Prodecer_Publish {
             channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_FANOUT_INFORM, "");
 
             String message = "这是发布订阅模式的消息";
-            channel.basicPublish("", QUEUE_INFORM_EMAIL, null, message.getBytes());
-            channel.basicPublish("", QUEUE_INFORM_SMS, null, message.getBytes());
+            channel.basicPublish(QUEUE_INFORM_EMAIL, "", null, message.getBytes());
+            channel.basicPublish(QUEUE_INFORM_SMS, "", null, message.getBytes());
 
             System.out.println("发送消息" + message);
 

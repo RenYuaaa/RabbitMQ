@@ -1,4 +1,4 @@
-package com.ren.rabbitmq.consumer;
+package com.ren.rabbitmq.consumer.subscribe;
 
 import com.rabbitmq.client.*;
 
@@ -7,14 +7,13 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/8 23:49
- * @desc :
+ * @date : 2020/7/8 23:43
+ * @desc : 发布订阅模式的消费者之一：email消费者
  */
-public class Consumer_Subscribe_Sms {
+public class Consumer_Subscribe_Email {
 
-
-    //短信的队列名称
-    private static final String QUEUE_INFORM_SMS = "queue_inform_sms";
+    //email的队列名称
+    private static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
 
     //交换机的名称
     private static final String EXCHANGE_FANOUT_INFORM = "exchange_fanout_inform";
@@ -22,7 +21,7 @@ public class Consumer_Subscribe_Sms {
     public static void main(String[] args) {
         //通过连接工厂创建心的连接和MQ建立连接
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.96.97.219");
+        connectionFactory.setHost("39.107.94.251");
         connectionFactory.setPort(5672);
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");
@@ -42,7 +41,7 @@ public class Consumer_Subscribe_Sms {
             channel = connection.createChannel();
 
 
-            channel.queueDeclare(QUEUE_INFORM_SMS, true, false, false, null);
+            channel.queueDeclare(QUEUE_INFORM_EMAIL, true, false, false, null);
 
             //声明一个交换机
             /**
@@ -63,7 +62,7 @@ public class Consumer_Subscribe_Sms {
              * 2、exchange：交换机名称
              * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
              */
-            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_FANOUT_INFORM, "");
+            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_FANOUT_INFORM, "");
 
 //            实现消费的方法
             DefaultConsumer defaultConsumer = new DefaultConsumer(channel) {
@@ -98,14 +97,14 @@ public class Consumer_Subscribe_Sms {
              * 2、autoAck：自动回复，当消费者接收到消费后要告诉mq消息已接受。如果将此参数设置为true，表示会自动回复mq；如果设置为false，则要通过编程实现回复
              * 3、callback：消费方法，当消费者接收到消息要执行的方法
              */
-            channel.basicConsume(QUEUE_INFORM_SMS, true, defaultConsumer);
+            channel.basicConsume(QUEUE_INFORM_EMAIL, true, defaultConsumer);
 
         } catch (IOException e) {
             System.out.println("接收消息失败" + e);
         } catch (TimeoutException e) {
             e.printStackTrace();
         } finally {
-//            //关闭通道
+            //关闭通道
 //            try {
 //                channel.close();
 //            } catch (IOException e) {

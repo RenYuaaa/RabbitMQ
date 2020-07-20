@@ -1,4 +1,4 @@
-package com.ren.rabbitmq.consumer;
+package com.ren.rabbitmq.consumer.routing;
 
 import com.rabbitmq.client.*;
 
@@ -7,15 +7,22 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/7 0:30
- * @desc : 普通模式的消息消费者
+ * @date : 2020/7/20 23:08
+ * @desc : 接收路由模式的短信消息
  */
-public class ConsumerOne {
+public class Consumer_Routing_Sms {
 
-    private static final String Queue = "hello_rabbitmq";
+    //邮件的队列名称
+    private static final String QUEUE_INFORM_SMS = "queue_inform_sms";
+
+    //交换机的名称
+    public static final String EXCHANGE_ROUTING_INFORM = "exchange_routing_inform";
+
+    //路由键的名称
+    public static final String ROUTINGKEY_SMS = "inform_sms";
 
     public static void main(String[] args) {
-//通过连接工厂创建心的连接和MQ建立连接
+        //通过连接工厂创建心的连接和MQ建立连接
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost("39.107.94.251");
         connectionFactory.setPort(5672);
@@ -37,16 +44,28 @@ public class ConsumerOne {
             channel = connection.createChannel();
 
 
-            //声明队列
+            channel.queueDeclare(QUEUE_INFORM_SMS, true, false, false, null);
+
+            //声明一个交换机
             /**
-             * queueDeclare方法的参数明细：String queue, boolean durable, boolean exclusive, boolean autoDelete, Map<String, Object> arguments
-             * 1、queue：队列名称
-             * 2、durable：是否持久化。如果持久化，则mq重启后队列还在
-             * 3、exclusive：是否独占连接，队列只允许在改连接中访问，如果连接关闭队列自动删除；如果将此参数设置为true，可用于临时队列的创建
-             * 4、autoDelete：是否自动删除，队列不再使用时是否自动删除此队列，如果将此参数和exclusive参数设置为true就可以实验临时队列
-             * 5、arguments：参数，可以设置一个队列的扩展参数，比如可以设置存货时间
+             * exchangeDeclare()参数明细：String exchange, String type
+             * 1、交换机的名称
+             * 2、交换机的类型
+             * fanout: 对应的rabbitMQ的工作模式是：publish/subscribe
+             * direct：对用的Routing工作模式
+             * topic：对应的Topics工作模式
+             * Headers：对应的headers工作模式
              */
-            channel.queueDeclare(Queue, true, false, false, null);
+            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+
+            //进行交换机和队列绑定
+            /**
+             * queueBind()参数明细：String queue, String exchange, String routingKey
+             * 1、queue 队列名称
+             * 2、exchange：交换机名称
+             * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
+             */
+            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_SMS);
 
 //            实现消费的方法
             DefaultConsumer defaultConsumer = new DefaultConsumer(channel) {
@@ -81,16 +100,14 @@ public class ConsumerOne {
              * 2、autoAck：自动回复，当消费者接收到消费后要告诉mq消息已接受。如果将此参数设置为true，表示会自动回复mq；如果设置为false，则要通过编程实现回复
              * 3、callback：消费方法，当消费者接收到消息要执行的方法
              */
-            channel.basicConsume(Queue, true, defaultConsumer);
-
+            channel.basicConsume(QUEUE_INFORM_SMS, true, defaultConsumer);
 
         } catch (IOException e) {
             System.out.println("接收消息失败" + e);
         } catch (TimeoutException e) {
             e.printStackTrace();
         } finally {
-            //消费者这里如果关闭通道的话，会接收不到生产者的消息。
-//            //关闭通道
+            //关闭通道
 //            try {
 //                channel.close();
 //            } catch (IOException e) {

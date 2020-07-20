@@ -10,17 +10,17 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author : renjiahui
  * @date : 2020/7/7 0:31
- * @desc :
+ * @desc : 普通模式的消息生产者
  */
 public class ProducerOne {
 
-    private static final String Queue = "hellorabbitmq";
+    private static final String Queue = "hello_rabbitmq";
 
     public static void main(String[] args) {
 
         //通过连接工厂创建心的连接和MQ建立连接
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost("47.96.97.219");
+        connectionFactory.setHost("39.107.94.251");
         connectionFactory.setPort(5672);
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");
