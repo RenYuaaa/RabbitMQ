@@ -1,19 +1,18 @@
-package com.ren.rabbitmq.producer.routing;
+package com.ren.rabbitmq.producer.header;
 
-import com.rabbitmq.client.BuiltinExchangeType;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
 
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/20 22:49
- * @desc : 路由模式的消息生产者
+ * @date : 2020/7/21 23:32
+ * @desc :
  */
-public class Producer_Routing {
+public class Producer_Header {
 
     //队列名称
     private static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
@@ -22,11 +21,7 @@ public class Producer_Routing {
     private static final String QUEUE_INFORM_SMS = "queue_inform_sms";
 
     //交换机的名称
-    public static final String EXCHANGE_ROUTING_INFORM = "exchange_routing_inform";
-
-    //路由键的名称
-    public static final String ROUTINGKEY_EMAIL = "inform_email";
-    public static final String ROUTINGKEY_SMS = "inform_sms";
+    public static final String EXCHANGE_HEADERS_INFORM = "exchange_headers_inform";
 
 
     public static void main(String[] args) {
@@ -62,18 +57,24 @@ public class Producer_Routing {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_HEADERS_INFORM, BuiltinExchangeType.HEADERS);
+
+            //header模式需要先设置好指定的键值对
+            Map<String, Object> header_email = new Hashtable<String, Object>();
+            header_email.put("inform_emial", "email");
+            Map<String, Object> header_sms = new Hashtable<String, Object>();
+            header_sms.put("infrom_sms", "sms");
 
             //进行交换机和队列绑定
             /**
-             * queueBind()参数明细：String queue, String exchange, String routingKey
+             * queueBind()参数明细：String queue, String exchange, String routingKey, Map<String, Object> arguments
              * 1、queue 队列名称
              * 2、exchange：交换机名称
-             * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
+             * 3、routingKey： 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
+             * 4、arguments：键值对
              */
-            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL);
-            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_SMS);
-
+            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_HEADERS_INFORM, "", header_email);
+            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_HEADERS_INFORM, "", header_sms);
 
             /**
              * basicPublish方法的参数明细：String exchange, String routingKey, boolean mandatory, boolean immediate, BasicProperties props, byte[] body
@@ -82,20 +83,21 @@ public class Producer_Routing {
              * 3、props：消息的属性
              * 4、body：消息内容
              */
-            for (int i = 0; i < 5; i++) {
-                //发送消息需要指定routingKey
-                String message = "这是路由模式的邮件消息";
-                channel.basicPublish(EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL, null, message.getBytes());
-                System.out.println("发送邮件消息：" + message);
-            }
+            String message = "这是Header模式发送出来的消息";
+            Map<String, Object> headers = new Hashtable<String, Object>();
+            headers.put("inform_email", "email");
+            AMQP.BasicProperties.Builder properties = new AMQP.BasicProperties.Builder();
+            properties.headers(headers);
+            channel.basicPublish(EXCHANGE_HEADERS_INFORM, "", properties.build(), message.getBytes());
+            System.out.println("发送邮件消息：" + message);
 
-            //发送的短息消息
-//            for (int i = 0; i < 5; i++) {
-            //发送消息需要指定routingKey
-//                String message = "这是路由模式的短信消息";
-//                channel.basicPublish(EXCHANGE_ROUTING_INFORM, ROUTINGKEY_SMS, null, message.getBytes());
-//                System.out.println("发送短信消息：" + message);
-//            }
+//            String message = "这是Header模式发送出来的消息";
+//            Map<String, Object> headers = new Hashtable<String, Object>();
+//            headers.put("inform_sms", "sms");
+//            AMQP.BasicProperties.Builder properties = new AMQP.BasicProperties.Builder();
+//            properties.headers(headers);
+//            channel.basicPublish(EXCHANGE_HEADERS_INFORM, "", properties.build(), message.getBytes());
+//            System.out.println("发送短信消息：" + message);
 
 
         } catch (IOException e) {

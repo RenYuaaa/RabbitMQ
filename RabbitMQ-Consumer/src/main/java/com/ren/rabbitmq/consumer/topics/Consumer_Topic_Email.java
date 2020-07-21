@@ -1,4 +1,4 @@
-package com.ren.rabbitmq.consumer.routing;
+package com.ren.rabbitmq.consumer.topics;
 
 import com.rabbitmq.client.*;
 
@@ -7,19 +7,20 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/20 23:08
- * @desc : 接收路由模式的邮件消息
+ * @date : 2020/7/21 23:04
+ * @desc :
  */
-public class Consumer_Routing_Email {
+public class Consumer_Topic_Email {
 
     //邮件的队列名称
     private static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
 
     //交换机的名称
-    public static final String EXCHANGE_ROUTING_INFORM = "exchange_routing_inform";
+    public static final String EXCHANGE_TOPICS_INFORM = "exchange_topics_inform";
 
     //路由键的名称
-    public static final String ROUTINGKEY_EMAIL = "inform_email";
+    public static final String ROUTINGKEY_EMAIL = "inform.#.email.#";
+
 
     public static void main(String[] args) {
         //通过连接工厂创建心的连接和MQ建立连接
@@ -56,7 +57,7 @@ public class Consumer_Routing_Email {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_TOPICS_INFORM, BuiltinExchangeType.TOPIC);
 
             //进行交换机和队列绑定
             /**
@@ -65,7 +66,7 @@ public class Consumer_Routing_Email {
              * 2、exchange：交换机名称
              * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
              */
-            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL);
+            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_TOPICS_INFORM, ROUTINGKEY_EMAIL);
 
 //            实现消费的方法
             DefaultConsumer defaultConsumer = new DefaultConsumer(channel) {

@@ -240,3 +240,25 @@ RabbitMQ有以下几种工作模式：
 符号*：只能匹配到一个词，比如inform.*，可以匹配inform.sms、inform.email
 ```
 
+
+## 3.5 Herder模式
+
+​	header模式与routing模式不同之处在于：header模式取消routingKey，使用Header中的key/values（键值对）匹配队列。
+
+案例：
+
+根据用户的通知设置去通知用户，设置接口Email的用户只接收Email，设置接收Sms的用户只接收Sms，设置两种通知类型都接收的则两种通知都有效。 
+
+
+
+## 3.6 RPC模式
+
+![RPC模式](图片/rpc.png)
+
+​	RPC即客户端远程调用服务端的方法，使用MQ可以实验RPC的异步调用，基于Direct交换机实现，流程如下：
+
+​		1、客户端即是生产者又是消费者，向RPC请求队列发送RPC调用消息，同事监听RPC响应队列。
+
+​		2、服务端监听RPC请求队列的消息，收到消息后执行服务端的方法，得到方法返回的结果。
+
+​		3、服务端将RPC方法的结果发送到RPC响应队列

@@ -1,25 +1,25 @@
-package com.ren.rabbitmq.consumer.routing;
+package com.ren.rabbitmq.consumer.header;
 
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/20 23:08
- * @desc : 接收路由模式的邮件消息
+ * @date : 2020/7/21 23:46
+ * @desc :
  */
-public class Consumer_Routing_Email {
+public class Consumer_Header_Sms {
 
-    //邮件的队列名称
-    private static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
+    //短信的队列名称
+    private static final String QUEUE_INFORM_SMS = "queue_inform_sms";
 
     //交换机的名称
-    public static final String EXCHANGE_ROUTING_INFORM = "exchange_routing_inform";
+    public static final String EXCHANGE_HEADERS_INFORM = "exchange_headers_inform";
 
-    //路由键的名称
-    public static final String ROUTINGKEY_EMAIL = "inform_email";
 
     public static void main(String[] args) {
         //通过连接工厂创建心的连接和MQ建立连接
@@ -44,7 +44,7 @@ public class Consumer_Routing_Email {
             channel = connection.createChannel();
 
 
-            channel.queueDeclare(QUEUE_INFORM_EMAIL, true, false, false, null);
+            channel.queueDeclare(QUEUE_INFORM_SMS, true, false, false, null);
 
             //声明一个交换机
             /**
@@ -56,7 +56,12 @@ public class Consumer_Routing_Email {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_HEADERS_INFORM, BuiltinExchangeType.HEADERS);
+
+
+            //header模式需要先设置好指定的键值对
+            Map<String, Object> header_sms = new Hashtable<String, Object>();
+            header_sms.put("infrom_sms", "sms");
 
             //进行交换机和队列绑定
             /**
@@ -65,7 +70,7 @@ public class Consumer_Routing_Email {
              * 2、exchange：交换机名称
              * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
              */
-            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL);
+            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_HEADERS_INFORM, "", header_sms);
 
 //            实现消费的方法
             DefaultConsumer defaultConsumer = new DefaultConsumer(channel) {
@@ -100,7 +105,7 @@ public class Consumer_Routing_Email {
              * 2、autoAck：自动回复，当消费者接收到消费后要告诉mq消息已接受。如果将此参数设置为true，表示会自动回复mq；如果设置为false，则要通过编程实现回复
              * 3、callback：消费方法，当消费者接收到消息要执行的方法
              */
-            channel.basicConsume(QUEUE_INFORM_EMAIL, true, defaultConsumer);
+            channel.basicConsume(QUEUE_INFORM_SMS, true, defaultConsumer);
 
         } catch (IOException e) {
             System.out.println("接收消息失败" + e);

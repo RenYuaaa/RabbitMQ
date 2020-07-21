@@ -1,4 +1,4 @@
-package com.ren.rabbitmq.producer.routing;
+package com.ren.rabbitmq.producer.topics;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -10,10 +10,10 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author : renjiahui
- * @date : 2020/7/20 22:49
- * @desc : 路由模式的消息生产者
+ * @date : 2020/7/21 23:03
+ * @desc :
  */
-public class Producer_Routing {
+public class Producer_Topic {
 
     //队列名称
     private static final String QUEUE_INFORM_EMAIL = "queue_inform_email";
@@ -22,11 +22,11 @@ public class Producer_Routing {
     private static final String QUEUE_INFORM_SMS = "queue_inform_sms";
 
     //交换机的名称
-    public static final String EXCHANGE_ROUTING_INFORM = "exchange_routing_inform";
+    public static final String EXCHANGE_TOPICS_INFORM = "exchange_topics_inform";
 
     //路由键的名称
-    public static final String ROUTINGKEY_EMAIL = "inform_email";
-    public static final String ROUTINGKEY_SMS = "inform_sms";
+    public static final String ROUTINGKEY_EMAIL = "inform.#.email.#";
+    public static final String ROUTINGKEY_SMS = "inform.#.sms.#";
 
 
     public static void main(String[] args) {
@@ -62,7 +62,7 @@ public class Producer_Routing {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_TOPICS_INFORM, BuiltinExchangeType.TOPIC);
 
             //进行交换机和队列绑定
             /**
@@ -71,8 +71,8 @@ public class Producer_Routing {
              * 2、exchange：交换机名称
              * 3、routingKey 路由Key，作用是交换机根据路由Key的值将消息转发到指定的队列中，在发布订阅模式中该值为空字符串
              */
-            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL);
-            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_ROUTING_INFORM, ROUTINGKEY_SMS);
+            channel.queueBind(QUEUE_INFORM_EMAIL, EXCHANGE_TOPICS_INFORM, ROUTINGKEY_EMAIL);
+            channel.queueBind(QUEUE_INFORM_SMS, EXCHANGE_TOPICS_INFORM, ROUTINGKEY_SMS);
 
 
             /**
@@ -82,20 +82,29 @@ public class Producer_Routing {
              * 3、props：消息的属性
              * 4、body：消息内容
              */
-            for (int i = 0; i < 5; i++) {
-                //发送消息需要指定routingKey
-                String message = "这是路由模式的邮件消息";
-                channel.basicPublish(EXCHANGE_ROUTING_INFORM, ROUTINGKEY_EMAIL, null, message.getBytes());
-                System.out.println("发送邮件消息：" + message);
-            }
 
-            //发送的短息消息
 //            for (int i = 0; i < 5; i++) {
-            //发送消息需要指定routingKey
-//                String message = "这是路由模式的短信消息";
-//                channel.basicPublish(EXCHANGE_ROUTING_INFORM, ROUTINGKEY_SMS, null, message.getBytes());
+//                //发送消息需要指定routingKey
+//                String message = "这是主题模式的邮件消息";
+//                channel.basicPublish(EXCHANGE_TOPICS_INFORM, "inform.email", null, message.getBytes());
+//                System.out.println("发送邮件消息：" + message);
+//            }
+//
+//            //发送的短息消息
+//            for (int i = 0; i < 5; i++) {
+//                //发送消息需要指定routingKey
+//                String message = "这是主题模式的短信消息";
+//                channel.basicPublish(EXCHANGE_TOPICS_INFORM, "inform.sms", null, message.getBytes());
 //                System.out.println("发送短信消息：" + message);
 //            }
+
+            //发送短信和email的消息
+            for (int i = 0; i<5; i++) {
+                //发送消息需要指定routingKey
+                String message = "这是主题模式发送的短信和邮件的消息";
+                channel.basicPublish(EXCHANGE_TOPICS_INFORM, "inform.sms.email", null, message.getBytes());
+                System.out.println("发送短信和email的消息：" + message);
+            }
 
 
         } catch (IOException e) {
