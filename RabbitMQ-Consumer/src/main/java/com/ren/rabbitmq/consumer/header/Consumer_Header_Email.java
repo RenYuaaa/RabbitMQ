@@ -92,6 +92,9 @@ public class Consumer_Header_Email {
                     //消息内容
                     String message = new String(body, "utf-8");
                     System.out.println("接收到消息：" + message);
+
+                    Map<String, Object> headers = properties.getHeaders();
+                    System.out.println(headers.get("inform_emial"));
                 }
             };
 
