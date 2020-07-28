@@ -56,7 +56,7 @@ public class Consumer_Routing_Email {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, "direct");
 
             //进行交换机和队列绑定
             /**

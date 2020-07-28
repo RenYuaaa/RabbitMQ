@@ -57,7 +57,7 @@ public class Consumer_Topic_Email {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_TOPICS_INFORM, BuiltinExchangeType.TOPIC);
+            channel.exchangeDeclare(EXCHANGE_TOPICS_INFORM, "topic");
 
             //进行交换机和队列绑定
             /**

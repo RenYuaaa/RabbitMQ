@@ -53,7 +53,7 @@ public class Consumer_Subscribe_Email {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_FANOUT_INFORM, BuiltinExchangeType.FANOUT);
+            channel.exchangeDeclare(EXCHANGE_FANOUT_INFORM, "fanout");
 
             //进行交换机和队列绑定
             /**

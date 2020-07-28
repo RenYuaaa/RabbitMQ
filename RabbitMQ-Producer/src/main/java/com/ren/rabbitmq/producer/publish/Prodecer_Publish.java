@@ -3,7 +3,6 @@ package com.ren.rabbitmq.producer.publish;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.BuiltinExchangeType;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -57,7 +56,7 @@ public class Prodecer_Publish {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_FANOUT_INFORM, BuiltinExchangeType.FANOUT);
+            channel.exchangeDeclare(EXCHANGE_FANOUT_INFORM, "fanout");
 
             //进行交换机和队列绑定
             /**

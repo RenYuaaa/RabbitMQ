@@ -1,6 +1,5 @@
 package com.ren.rabbitmq.producer.routing;
 
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -62,7 +61,7 @@ public class Producer_Routing {
              * topic：对应的Topics工作模式
              * Headers：对应的headers工作模式
              */
-            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, BuiltinExchangeType.DIRECT);
+            channel.exchangeDeclare(EXCHANGE_ROUTING_INFORM, "direct");
 
             //进行交换机和队列绑定
             /**
