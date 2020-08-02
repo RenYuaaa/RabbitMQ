@@ -29,7 +29,20 @@ public class MyConsumer extends DefaultConsumer {
         System.out.println("properties：" + properties);
         System.out.println("body：" + new String(body));
 
-        //手动回复应答
-        channel.basicAck(envelope.getDeliveryTag(), false);
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //ack里面用
+//        if ((Integer)properties.getHeaders().get("num") == 0) {
+//            //最后一个参数代表是否重回队列
+//            channel.basicNack(envelope.getDeliveryTag(), false, true);
+//        } else {
+//            //手动回复应答
+//            channel.basicAck(envelope.getDeliveryTag(), false);
+//        }
+
     }
 }

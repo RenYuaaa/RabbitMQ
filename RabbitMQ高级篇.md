@@ -146,3 +146,63 @@ void BasicQos(uint prefetchSize, ushort prefetchCount, bool global);
 //prefetch_count在no_ack = falsed 情况下生效，即在自动应答的情况下，这两个值是不生效的。
 ```
 
+
+
+
+# 6、消费端ACK与重回队列
+
+## 6.1、消费端的手工ACK和NACK
+
+ACK使用场景:
+
+* 消费端进行消费的时候，如果由于业务异常，我们克进行日志的记录，然后进行补偿。
+
+* 如果由于服务器宕机等严重问题，那我们就需要手工进行ACK保障消费端消费成功。
+
+
+
+## 6.2 消费端的重回队列
+
+消费端重回队列是为了对没有处理成功的消息，把消息重新回递给Broker！
+
+一般实际应用中，都会关闭重回队列，也就是设置为false。
+
+
+
+# 7、死信队列（重点）
+
+## 7.1、TTL
+
+* TTL是Time To Live的缩写，也就是生存时间
+* RabbitMQ支持消息的过期时间，在消息发送时也可以进行指定
+* RabbitMQ支持队列的过期时间，从消息进入队列开始计算，只要超过了队列的超时时间配置，那么消息会自动的清除
+
+
+
+## 7.2 死信队列：DLX，Dead-Letter-Exchange
+
+利用DLX，当消息在一个队列中变成死信之后，他能被重新publish到另一个Exchange，这个Exchange就是DLX。
+
+**消息变成死信有以下几种情况：**
+
+* 消息被拒绝（basic.reject/basic.nack）并且requeue = false
+* 消息TTL过期
+* 队列达到最大长度
+
+DLX也是一个正常的Exchange，和一般Exchange没有区别，他能在任何的队列上被指定，实际上就是设置某个队列的属性。
+
+当这个队列中有死信时，RabbitMQ就会自动的将这个消息重新发布到设置的Exchange上去，进而被路由到领一个队列。
+
+可以监听这个队列中消息做相应的处理，这个特性可以弥补RabbitMQ3.0以前支持的immediate参数的功能。
+
+
+
+死信队列设置：
+
+* 首先要设置死信队列的Exchange和Queue，然后进行绑定：
+  * Exchange：dlx.exchange
+  * Queue：dlx.queue
+  * RoutingKey：#
+* 然后我们进行正常的生命交换机、队列、绑定，只不过需要在队列上加上一个参数：
+  * arguments.put("x-dead-letter-exchage", "dlx.exchange");
+  * 这样消息在过期、requeue、队列在达到最大长度时，消息就可以直接路由到死信队列。
